@@ -1,5 +1,10 @@
 package com.fastpdf.ui.screens
 
+import android.content.Intent
+import android.database.Cursor
+import android.provider.OpenableColumns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,34 +42,78 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.fastpdf.data.CurrentFile
 import com.fastpdf.domain.model.DocumentFile
 import com.fastpdf.domain.model.DocumentType
 import com.fastpdf.ui.components.DocumentFileItem
 import com.fastpdf.ui.theme.Primary
 
 /**
- * Files Screen — Browse all documents.
+ * Supported MIME types for file picker.
+ */
+private val SUPPORTED_MIME_TYPES = arrayOf(
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-powerpoint",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "text/*",
+    "image/*"
+)
+
+/**
+ * Files Screen with real file picker integration.
  *
- * Layout matches reference screenshot:
- * - Top bar: Menu + "Files" + Search
+ * - FAB opens system file picker
  * - Sort dropdown + List/Grid toggle
- * - Scrollable file list with all document types
- * - FAB for adding new files
- *
- * Uses LazyColumn with keys for efficient diffing.
+ * - Shows all document types with appropriate icons
+ * - Picked file navigates to ReaderScreen
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilesScreen(
     onFileClick: (String) -> Unit
 ) {
+    val context = LocalContext.current
     var sortOption by remember { mutableStateOf("Recent First") }
     var isGridView by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
 
-    // Mock data — all supported document types
+    // SAF file picker
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let { selectedUri ->
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    selectedUri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) { }
+
+            var fileName = "Unknown File"
+            var fileSize = 0L
+            var mimeType = context.contentResolver.getType(selectedUri) ?: ""
+
+            context.contentResolver.query(selectedUri, null, null, null, null)?.use { cursor: Cursor ->
+                if (cursor.moveToFirst()) {
+                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+                    if (nameIndex >= 0) fileName = cursor.getString(nameIndex) ?: fileName
+                    if (sizeIndex >= 0) fileSize = cursor.getLong(sizeIndex)
+                }
+            }
+
+            CurrentFile.set(uri = selectedUri, name = fileName, mimeType = mimeType, sizeBytes = fileSize)
+            onFileClick("picked")
+        }
+    }
+
+    // Mock data with all document types
     val allFiles = remember {
         listOf(
             DocumentFile("f1", "Quarterly_Report_Q3.pdf", DocumentType.PDF, 4_404_019, "Oct 12, 2023"),
@@ -91,27 +140,21 @@ fun FilesScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* TODO: Drawer */ }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Menu")
-                    }
+                    IconButton(onClick = { }) { Icon(Icons.Filled.Menu, contentDescription = "Menu") }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Search */ }) {
-                        Icon(Icons.Filled.Search, contentDescription = "Search")
-                    }
+                    IconButton(onClick = { }) { Icon(Icons.Filled.Search, contentDescription = "Search") }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* TODO: Add file */ },
+                onClick = { filePickerLauncher.launch(SUPPORTED_MIME_TYPES) },
                 containerColor = Primary,
                 contentColor = Color.White
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add File")
+                Icon(Icons.Filled.Add, contentDescription = "Open File")
             }
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -130,7 +173,6 @@ fun FilesScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Sort dropdown
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         TextButton(onClick = { showSortMenu = true }) {
                             Text(
@@ -146,24 +188,15 @@ fun FilesScreen(
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-
-                        DropdownMenu(
-                            expanded = showSortMenu,
-                            onDismissRequest = { showSortMenu = false }
-                        ) {
+                        DropdownMenu(expanded = showSortMenu, onDismissRequest = { showSortMenu = false }) {
                             listOf("Recent First", "Name", "Size").forEach { option ->
                                 DropdownMenuItem(
                                     text = { Text(option) },
-                                    onClick = {
-                                        sortOption = option
-                                        showSortMenu = false
-                                    }
+                                    onClick = { sortOption = option; showSortMenu = false }
                                 )
                             }
                         }
                     }
-
-                    // Grid/List toggle
                     IconButton(onClick = { isGridView = !isGridView }) {
                         Icon(
                             imageVector = if (isGridView) Icons.Filled.ViewList else Icons.Filled.GridView,
@@ -175,20 +208,14 @@ fun FilesScreen(
             }
 
             // ━━━ File List ━━━
-            items(
-                items = allFiles,
-                key = { it.id }
-            ) { file ->
+            items(items = allFiles, key = { it.id }) { file ->
                 DocumentFileItem(
                     file = file,
                     onClick = { onFileClick(file.id) }
                 )
             }
 
-            // Bottom spacing for FAB
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
-            }
+            item { Spacer(modifier = Modifier.height(80.dp)) }
         }
     }
 }
