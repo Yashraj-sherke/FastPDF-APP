@@ -24,9 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Draw
-import androidx.compose.material.icons.filled.FormatColorFill
 import androidx.compose.material.icons.filled.Redo
-import androidx.compose.material.icons.filled.Stamp
+import androidx.compose.material.icons.filled.Approval
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.Icon
@@ -133,7 +132,7 @@ fun AnnotationToolbar(
 
                 // Stamp
                 ToolButton(
-                    icon = Icons.Filled.Stamp,
+                    icon = Icons.Filled.Approval,
                     label = "Stamp",
                     isActive = activeTool == EditTool.STAMP,
                     onClick = { onToolSelect(if (activeTool == EditTool.STAMP) EditTool.NONE else EditTool.STAMP) }

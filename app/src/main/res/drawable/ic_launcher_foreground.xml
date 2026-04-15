@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Lightning bolt icon representing "Fast" -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,24 L42,54 L50,54 L46,84 L66,48 L56,48 L62,24 Z" />
+
+    <!-- Small PDF text -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:alpha="0.7"
+        android:pathData="M38,68 L42,68 Q44,68 44,70 Q44,72 42,72 L40,72 L40,76 L38,76 Z M40,70 L41.5,70 Q42,70 42,70.5 Q42,71 41.5,71 L40,71 Z" />
+</vector>
