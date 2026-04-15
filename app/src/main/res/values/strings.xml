@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">FastPDF</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_tools">Tools</string>
+    <string name="nav_files">Files</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">My Files</string>
+    <string name="recent_files">Recent Files</string>
+    <string name="favorites">Favorites</string>
+    <string name="ai_summary_title">AI Summary</string>
+    <string name="ai_summary_desc">available for %d files</string>
+
+    <!-- Tools Screen -->
+    <string name="tools_title">Tools</string>
+    <string name="tools_subtitle">Advanced document processing at your fingertips</string>
+    <string name="tool_merge">Merge</string>
+    <string name="tool_split">Split</string>
+    <string name="tool_compress">Compress</string>
+    <string name="tool_image_to_pdf">Image to PDF</string>
+    <string name="tool_scan">Scan</string>
+    <string name="tool_ocr">OCR</string>
+    <string name="tool_sign">Sign</string>
+    <string name="tool_convert">Convert</string>
+    <string name="unlock_pro">Unlock Pro Tools</string>
+    <string name="unlock_pro_desc">Get unlimited OCR and advanced security features.</string>
+    <string name="upgrade_now">Upgrade Now</string>
+
+    <!-- Files Screen -->
+    <string name="files_title">Files</string>
+    <string name="sort_recent">Recent First</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_size">Size</string>
+
+    <!-- Reader Screen -->
+    <string name="reader_title">Viewer</string>
+    <string name="reader_placeholder">Document Viewer — Coming Soon</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_title">Profile</string>
+
+    <!-- General -->
+    <string name="search">Search</string>
+    <string name="menu">Menu</string>
+    <string name="add_file">Add File</string>
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Brand Colors -->
+    <color name="primary">#FF4A6CF7</color>
+    <color name="primary_light">#FFE8EDFF</color>
+    <color name="on_primary">#FFFFFFFF</color>
+
+    <!-- Surface Colors -->
+    <color name="surface">#FFFAFBFF</color>
+    <color name="on_surface">#FF1A1C2E</color>
+    <color name="on_surface_variant">#FF6B7280</color>
+
+    <!-- Background -->
+    <color name="background">#FFFFFFFF</color>
+
+    <!-- Accent -->
+    <color name="accent_orange">#FFFF8C42</color>
+    <color name="accent_green">#FF10B981</color>
+
+    <!-- Outline -->
+    <color name="outline">#FFE5E7EB</color>
+</resources>
