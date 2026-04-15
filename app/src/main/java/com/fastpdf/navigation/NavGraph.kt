@@ -1,5 +1,6 @@
 package com.fastpdf.navigation
 
+import android.net.Uri
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -15,16 +16,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.fastpdf.data.CurrentFile
+import com.fastpdf.domain.model.DocumentType
 import com.fastpdf.ui.components.BottomNavBar
 import com.fastpdf.ui.screens.FilesScreen
 import com.fastpdf.ui.screens.HomeScreen
 import com.fastpdf.ui.screens.ProfileScreen
 import com.fastpdf.ui.screens.ReaderScreen
+import com.fastpdf.ui.screens.ScannerScreen
 import com.fastpdf.ui.screens.ToolsScreen
 
 /**
  * Main navigation graph for FastPDF.
- * Handles bottom nav + reader screen transitions.
+ * Handles bottom nav + reader + scanner screen transitions.
  */
 @Composable
 fun NavGraph() {
@@ -48,7 +52,6 @@ fun NavGraph() {
                     currentRoute = currentRoute ?: Screen.Home.route,
                     onNavigate = { route ->
                         navController.navigate(route) {
-                            // Pop up to start destination to avoid stacking
                             popUpTo(Screen.Home.route) {
                                 saveState = true
                             }
@@ -81,7 +84,11 @@ fun NavGraph() {
             }
 
             composable(Screen.Tools.route) {
-                ToolsScreen()
+                ToolsScreen(
+                    onScanClick = {
+                        navController.navigate(Screen.Scanner.route)
+                    }
+                )
             }
 
             composable(Screen.Files.route) {
@@ -96,7 +103,7 @@ fun NavGraph() {
                 ProfileScreen()
             }
 
-            // ━━━ Full-Screen Routes ━━━
+            // ━━━ Full-Screen: Document Viewer ━━━
             composable(
                 route = Screen.Reader.route,
                 arguments = listOf(
@@ -119,6 +126,38 @@ fun NavGraph() {
                 ReaderScreen(
                     fileId = fileId,
                     onBack = { navController.popBackStack() }
+                )
+            }
+
+            // ━━━ Full-Screen: Document Scanner ━━━
+            composable(
+                route = Screen.Scanner.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                        animationSpec = tween(350)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                        animationSpec = tween(350)
+                    )
+                }
+            ) {
+                ScannerScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenPdf = { pdfUri: Uri ->
+                        // Set the scanned PDF as current file and open viewer
+                        CurrentFile.set(
+                            uri = pdfUri,
+                            name = "Scanned Document.pdf",
+                            mimeType = "application/pdf"
+                        )
+                        navController.navigate(Screen.Reader.createRoute("scanned")) {
+                            popUpTo(Screen.Scanner.route) { inclusive = true }
+                        }
+                    }
                 )
             }
         }

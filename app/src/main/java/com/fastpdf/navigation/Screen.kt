@@ -22,4 +22,7 @@ sealed class Screen(val route: String) {
     data object Reader : Screen("reader/{fileId}") {
         fun createRoute(fileId: String): String = "reader/$fileId"
     }
+
+    /** Scanner — document scanning with ML Kit */
+    data object Scanner : Screen("scanner")
 }

@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.Draw
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -46,33 +47,33 @@ import com.fastpdf.ui.components.ToolCard
  */
 private data class ToolItem(
     val icon: ImageVector,
-    val label: String
+    val label: String,
+    val action: String = "" // Route identifier for navigation
 )
 
 /**
  * Tools Screen — Document processing tools grid.
  *
- * Layout matches reference screenshot:
- * - Top bar: Menu + "Digital Atelier" + Search
- * - "Tools" heading + subtitle
- * - 2-column grid of tool cards
- * - "Unlock Pro Tools" banner at bottom
- *
- * Uses LazyVerticalGrid for efficient grid rendering.
+ * - Scan tool → navigates to ScannerScreen (Phase 3)
+ * - Other tools → TODO in Phase 5
+ * - 2-column grid with Pro banner
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ToolsScreen() {
+fun ToolsScreen(
+    onScanClick: () -> Unit = {}
+) {
     val tools = remember {
         listOf(
-            ToolItem(Icons.Filled.CallMerge, "Merge"),
-            ToolItem(Icons.Filled.ContentCut, "Split"),
-            ToolItem(Icons.Filled.Compress, "Compress"),
-            ToolItem(Icons.Filled.Image, "Image to PDF"),
-            ToolItem(Icons.Filled.DocumentScanner, "Scan"),
-            ToolItem(Icons.Filled.TextFields, "OCR"),
-            ToolItem(Icons.Filled.Draw, "Sign"),
-            ToolItem(Icons.Filled.SwapHoriz, "Convert")
+            ToolItem(Icons.Filled.DocumentScanner, "Scan", "scan"),
+            ToolItem(Icons.Filled.CallMerge, "Merge", "merge"),
+            ToolItem(Icons.Filled.ContentCut, "Split", "split"),
+            ToolItem(Icons.Filled.Compress, "Compress", "compress"),
+            ToolItem(Icons.Filled.Image, "Image to PDF", "image_to_pdf"),
+            ToolItem(Icons.Filled.TextFields, "OCR", "ocr"),
+            ToolItem(Icons.Filled.Draw, "Sign", "sign"),
+            ToolItem(Icons.Filled.SwapHoriz, "Convert", "convert"),
+            ToolItem(Icons.Filled.Lock, "Protect", "protect")
         )
     }
 
@@ -142,7 +143,13 @@ fun ToolsScreen() {
                 ToolCard(
                     icon = tool.icon,
                     label = tool.label,
-                    onClick = { /* TODO: Navigate to tool */ }
+                    onClick = {
+                        when (tool.action) {
+                            "scan" -> onScanClick()
+                            // Other tools → Phase 5
+                            else -> { /* TODO */ }
+                        }
+                    }
                 )
             }
 
