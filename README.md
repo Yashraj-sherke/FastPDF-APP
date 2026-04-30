@@ -8,10 +8,15 @@ Open and manage **PDF, Word, Excel, PowerPoint, Images, and Text files** — all
 
 ## 📱 Features
 
-- 🏠 **Home** — Recent files, favorites, AI summary cards
-- 🛠️ **Tools** — Merge, Split, Compress, OCR, Sign, Convert
-- 📁 **Files** — Browse, sort, and organize all your documents
-- 👤 **Profile** — Settings, storage stats, cloud sync
+- 🏠 **Home** — Recent files, favorites, AI summary cards, continue reading
+- 🛠️ **Tools** — Merge, Split, Compress, OCR, Sign, Convert, Reorder Pages
+- 📁 **Files** — Browse, sort, organize, multi-select batch operations
+- 👤 **Profile** — Settings, storage stats, dark mode
+- 🗑️ **Recycle Bin** — Soft-deleted files with restore & auto-purge
+- 🎉 **Onboarding** — First-launch welcome carousel
+- 📊 **Storage Manager** — Visual storage breakdown, cache management
+- ℹ️ **About** — App info, credits, rate & share
+- 📋 **Document Info** — File metadata sheet with quick actions
 
 ## 🏗️ Tech Stack
 
@@ -64,10 +69,11 @@ com.fastpdf/
 - [x] Day 1: Project setup, navigation, base UI, theme
 - [ ] Day 2: File system access, PDF rendering
 - [ ] Day 3: Document viewer (Word, Excel, PPT)
-- [ ] Day 4: Search, favorites persistence
-- [ ] Day 5: Tools implementation (merge, split, compress)
-- [ ] Day 6: Cloud sync, dark mode
-- [ ] Day 7: Polish, testing, release build
+- [x] Day 4: Search, favorites persistence
+- [x] Day 5: Tools implementation (merge, split, compress, OCR, watermark, protect, convert)
+- [x] Day 6: AI features, dark mode, splash screen, share, app shortcuts
+- [x] Day 7: Batch operations, recycle bin, page reorder, onboarding
+- [x] Day 8: Storage manager, about screen, document info sheet, dark mode polish
 
 ## 📄 License
 

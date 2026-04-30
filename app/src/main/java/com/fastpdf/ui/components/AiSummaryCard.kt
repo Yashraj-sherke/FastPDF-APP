@@ -1,6 +1,7 @@
 package com.fastpdf.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,11 +34,12 @@ import com.fastpdf.ui.theme.SurfaceVariant
 /**
  * AI Summary promotional card for the Home screen.
  * Blue gradient card + two smaller action cards in a row.
- * Matches the reference UI layout.
+ * Now clickable — navigates to AI Summary Screen.
  */
 @Composable
 fun AiSummaryCard(
     fileCount: Int,
+    onAiClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -46,7 +48,7 @@ fun AiSummaryCard(
             .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Main AI Summary card (blue gradient)
+        // Main AI Summary card (blue gradient) — now clickable
         Box(
             modifier = Modifier
                 .weight(1.4f)
@@ -57,6 +59,7 @@ fun AiSummaryCard(
                         colors = listOf(GradientStart, GradientEnd)
                     )
                 )
+                .clickable(onClick = onAiClick)
                 .padding(16.dp)
         ) {
             Column {
@@ -74,7 +77,7 @@ fun AiSummaryCard(
                     fontSize = 14.sp
                 )
                 Text(
-                    text = "available for $fileCount files",
+                    text = "Tap to analyze docs",
                     color = Color.White.copy(alpha = 0.8f),
                     fontSize = 12.sp
                 )

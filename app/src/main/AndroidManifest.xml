@@ -42,7 +42,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.FastPDF">
+            android:theme="@style/Theme.FastPDF.Splash">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -80,6 +80,11 @@
                 <data android:mimeType="application/vnd.ms-powerpoint" />
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.presentationml.presentation" />
             </intent-filter>
+
+            <!-- App Shortcuts (Phase 8) -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
     </application>
 </manifest>

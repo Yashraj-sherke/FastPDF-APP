@@ -46,4 +46,12 @@
     <string name="search">Search</string>
     <string name="menu">Menu</string>
     <string name="add_file">Add File</string>
+
+    <!-- App Shortcuts (Phase 8) -->
+    <string name="shortcut_scan">Quick Scan</string>
+    <string name="shortcut_scan_long">Scan a document</string>
+    <string name="shortcut_open">Open File</string>
+    <string name="shortcut_open_long">Open a document</string>
+    <string name="shortcut_ai">AI Summary</string>
+    <string name="shortcut_ai_long">AI document analysis</string>
 </resources>

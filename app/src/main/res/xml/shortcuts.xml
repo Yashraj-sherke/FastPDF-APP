@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="scan"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:shortcutShortLabel="@string/shortcut_scan"
+        android:shortcutLongLabel="@string/shortcut_scan_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.fastpdf"
+            android:targetClass="com.fastpdf.MainActivity"
+            android:data="fastpdf://scan" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="open"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_add"
+        android:shortcutShortLabel="@string/shortcut_open"
+        android:shortcutLongLabel="@string/shortcut_open_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.fastpdf"
+            android:targetClass="com.fastpdf.MainActivity"
+            android:data="fastpdf://open" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="ai"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:shortcutShortLabel="@string/shortcut_ai"
+        android:shortcutLongLabel="@string/shortcut_ai_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.fastpdf"
+            android:targetClass="com.fastpdf.MainActivity"
+            android:data="fastpdf://ai" />
+    </shortcut>
+</shortcuts>

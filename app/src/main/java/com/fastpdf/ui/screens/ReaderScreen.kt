@@ -1,5 +1,6 @@
 package com.fastpdf.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -45,11 +47,14 @@ import com.fastpdf.ui.editor.AnnotationToolbar
 import com.fastpdf.ui.editor.DrawingCanvas
 import com.fastpdf.ui.editor.SignaturePad
 import com.fastpdf.ui.editor.StampPicker
+import com.fastpdf.ui.components.AiChatSheet
+import com.fastpdf.ui.components.DocumentInfoSheet
 import com.fastpdf.ui.theme.Primary
 import com.fastpdf.ui.viewer.ImageViewerContent
 import com.fastpdf.ui.viewer.OfficeViewerContent
 import com.fastpdf.ui.viewer.PdfViewerContent
 import com.fastpdf.ui.viewer.TextViewerContent
+import androidx.compose.ui.platform.LocalContext
 
 /**
  * Smart Reader Screen with editing capabilities.
@@ -70,6 +75,7 @@ fun ReaderScreen(
 ) {
     val fileName = CurrentFile.name.ifEmpty { "Document" }
     val fileType = CurrentFile.type
+    val context = LocalContext.current
 
     // Edit mode state
     var isEditMode by remember { mutableStateOf(false) }
@@ -84,6 +90,8 @@ fun ReaderScreen(
     // Bottom sheet state
     var showSignaturePad by remember { mutableStateOf(false) }
     var showStampPicker by remember { mutableStateOf(false) }
+    var showAiChat by remember { mutableStateOf(false) }
+    var showDocInfo by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
 
     // Image viewer has black background
@@ -136,10 +144,23 @@ fun ReaderScreen(
                                 )
                             }
                         }
-                        IconButton(onClick = { /* TODO: Share */ }) {
+                        // AI Chat button
+                        IconButton(onClick = { showAiChat = true }) {
+                            Icon(Icons.Filled.AutoAwesome, contentDescription = "AI", tint = Primary)
+                        }
+                        IconButton(onClick = {
+                            CurrentFile.uri?.let { uri ->
+                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                    type = CurrentFile.mimeType.ifEmpty { "*/*" }
+                                    putExtra(Intent.EXTRA_STREAM, uri)
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+                                context.startActivity(Intent.createChooser(shareIntent, "Share ${CurrentFile.name}"))
+                            }
+                        }) {
                             Icon(Icons.Filled.Share, contentDescription = "Share", tint = topBarContentColor)
                         }
-                        IconButton(onClick = { /* TODO: More */ }) {
+                        IconButton(onClick = { showDocInfo = true }) {
                             Icon(Icons.Filled.MoreVert, contentDescription = "More", tint = topBarContentColor)
                         }
                     }
@@ -305,6 +326,30 @@ fun ReaderScreen(
                         )
                         showStampPicker = false
                     }
+                )
+            }
+        }
+
+        // ━━━ AI Chat Bottom Sheet ━━━
+        if (showAiChat) {
+            ModalBottomSheet(
+                onDismissRequest = { showAiChat = false },
+                sheetState = sheetState,
+                containerColor = MaterialTheme.colorScheme.surface
+            ) {
+                AiChatSheet(onDismiss = { showAiChat = false })
+            }
+        }
+
+        // ━━━ Document Info Bottom Sheet (Phase 10) ━━━
+        if (showDocInfo) {
+            ModalBottomSheet(
+                onDismissRequest = { showDocInfo = false },
+                sheetState = sheetState,
+                containerColor = MaterialTheme.colorScheme.surface
+            ) {
+                DocumentInfoSheet(
+                    onDismiss = { showDocInfo = false }
                 )
             }
         }

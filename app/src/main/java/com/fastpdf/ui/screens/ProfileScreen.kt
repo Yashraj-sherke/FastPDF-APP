@@ -1,6 +1,7 @@
 package com.fastpdf.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,35 +28,54 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.fastpdf.data.ThemePreferences
+import com.fastpdf.data.db.FileRepository
 import com.fastpdf.ui.theme.Primary
 import com.fastpdf.ui.theme.PrimaryLight
 import com.fastpdf.ui.theme.SurfaceVariant
+import kotlinx.coroutines.launch
 
 /**
  * Profile Screen — User settings and preferences.
- * Clean list layout with avatar, stats, and settings items.
+ *
+ * Phase 8: Added working dark mode toggle with DataStore persistence.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(
+    onNavigate: (String) -> Unit = {}
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val isDarkMode by ThemePreferences.isDarkMode(context).collectAsState(initial = false)
+    val repository = remember { FileRepository(context) }
+    val fileCount by repository.fileCount.collectAsState(initial = 0)
+    val totalSize by repository.totalSize.collectAsState(initial = 0L)
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -126,12 +146,12 @@ fun ProfileScreen() {
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(SurfaceVariant)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                         .padding(20.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    StatItem(value = "24", label = "Files")
-                    StatItem(value = "148 MB", label = "Used")
+                    StatItem(value = "$fileCount", label = "Files")
+                    StatItem(value = formatStorageSize(totalSize), label = "Used")
                     StatItem(value = "Free", label = "Plan")
                 }
             }
@@ -150,7 +170,8 @@ fun ProfileScreen() {
                 SettingsItem(
                     icon = Icons.Filled.Storage,
                     title = "Storage",
-                    subtitle = "Manage local storage"
+                    subtitle = "Manage local storage",
+                    onClick = { onNavigate(com.fastpdf.navigation.Screen.StorageManager.route) }
                 )
             }
             item {
@@ -163,13 +184,46 @@ fun ProfileScreen() {
 
             item { HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) }
 
+            // ━━━ Dark Mode Toggle (Phase 8) ━━━
             item {
-                SettingsItem(
-                    icon = Icons.Filled.DarkMode,
-                    title = "Appearance",
-                    subtitle = "Theme & display"
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.DarkMode,
+                        contentDescription = "Dark Mode",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Dark Mode",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = if (isDarkMode) "On" else "Off",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = isDarkMode,
+                        onCheckedChange = { enabled ->
+                            scope.launch { ThemePreferences.setDarkMode(context, enabled) }
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Primary,
+                            checkedTrackColor = Primary.copy(alpha = 0.3f)
+                        )
+                    )
+                }
             }
+
             item {
                 SettingsItem(
                     icon = Icons.Filled.Security,
@@ -191,7 +245,8 @@ fun ProfileScreen() {
                 SettingsItem(
                     icon = Icons.Filled.Info,
                     title = "About",
-                    subtitle = "Version 1.0.0"
+                    subtitle = "Version 1.0.0",
+                    onClick = { onNavigate(com.fastpdf.navigation.Screen.About.route) }
                 )
             }
             item {
@@ -230,11 +285,13 @@ private fun SettingsItem(
     icon: ImageVector,
     title: String,
     subtitle: String,
-    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant
+    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    onClick: (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -267,3 +324,12 @@ private fun SettingsItem(
         )
     }
 }
+
+private fun formatStorageSize(bytes: Long): String = when {
+    bytes <= 0 -> "0 B"
+    bytes < 1024 -> "$bytes B"
+    bytes < 1024 * 1024 -> "${bytes / 1024} KB"
+    bytes < 1024 * 1024 * 1024 -> "%.1f MB".format(bytes / (1024.0 * 1024.0))
+    else -> "%.1f GB".format(bytes / (1024.0 * 1024.0 * 1024.0))
+}
+

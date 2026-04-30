@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -11,8 +12,8 @@ android {
         applicationId = "com.fastpdf"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -38,12 +39,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -70,6 +71,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
 
     // Compose UI
@@ -92,11 +94,37 @@ dependencies {
     // Splash Screen
     implementation("androidx.core:core-splashscreen:1.0.1")
 
+    // DataStore (Phase 8: theme preferences)
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // Background work orchestration
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    // Phase 7: Room Database (file history, favorites)
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
+
     // Image Loading (Phase 2)
     implementation("io.coil-kt:coil-compose:2.6.0")
 
     // Document Scanner — ML Kit (Phase 3)
     implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta1")
+
+    // Phase 5: PDF Tools Engine
+    // PDF Manipulation (merge, split, compress, watermark, encrypt)
+    implementation("com.itextpdf:kernel:7.2.5")
+    implementation("com.itextpdf:layout:7.2.5")
+    implementation("com.itextpdf:io:7.2.5")
+
+    // OCR — ML Kit Text Recognition
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+
+    // Coroutine support for Play Services Tasks (.await())
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+
+    // Phase 6: AI Features — Google Gemini
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
 
     // Debug tooling
     debugImplementation("androidx.compose.ui:ui-tooling")

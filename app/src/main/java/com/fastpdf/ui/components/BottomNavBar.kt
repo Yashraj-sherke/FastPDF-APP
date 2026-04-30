@@ -3,6 +3,7 @@ package com.fastpdf.ui.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -21,6 +22,8 @@ import com.fastpdf.ui.theme.NavBarIndicator
 /**
  * Bottom navigation bar matching the reference UI.
  * 4 tabs: Home, Tools, Files, Profile with smooth color transitions.
+ *
+ * Phase 10: Fixed dark mode support — uses MaterialTheme colors instead of hardcoded white.
  */
 @Composable
 fun BottomNavBar(
@@ -28,8 +31,8 @@ fun BottomNavBar(
     onNavigate: (String) -> Unit
 ) {
     NavigationBar(
-        containerColor = Color.White,
-        tonalElevation = 0.dp
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 2.dp
     ) {
         bottomNavItems.forEach { item ->
             val isSelected = currentRoute == item.route

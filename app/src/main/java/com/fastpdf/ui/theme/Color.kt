@@ -68,3 +68,17 @@ val GradientEnd = Color(0xFF6C8AFF)
 val NavBarSelected = Primary
 val NavBarUnselected = Color(0xFF9CA3AF)
 val NavBarIndicator = PrimaryLight
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// Dark Theme Colors
+// ━━━━━━━━━━━━━━━━━━━━━━━
+val DarkBackground = Color(0xFF0F1118)
+val DarkSurface = Color(0xFF171923)
+val DarkSurfaceVariant = Color(0xFF1E2130)
+val DarkOnSurface = Color(0xFFE4E6EB)
+val DarkOnSurfaceVariant = Color(0xFF9CA3AF)
+val DarkOutline = Color(0xFF2D3142)
+val DarkOutlineVariant = Color(0xFF252838)
+val DarkPrimaryContainer = Color(0xFF1E2A5E)
+val DarkSecondaryContainer = Color(0xFF252838)
+

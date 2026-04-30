@@ -21,9 +21,11 @@ import androidx.compose.material.icons.filled.Draw
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.Water
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.fastpdf.navigation.Screen
 import com.fastpdf.ui.components.ProBannerCard
 import com.fastpdf.ui.components.ToolCard
 
@@ -48,32 +51,43 @@ import com.fastpdf.ui.components.ToolCard
 private data class ToolItem(
     val icon: ImageVector,
     val label: String,
-    val action: String = "" // Route identifier for navigation
+    val route: String = "" // Route identifier for navigation
 )
 
 /**
  * Tools Screen — Document processing tools grid.
  *
- * - Scan tool → navigates to ScannerScreen (Phase 3)
- * - Other tools → TODO in Phase 5
- * - 2-column grid with Pro banner
+ * Phase 5: All tools now navigate to functional tool screens.
+ * - Scan → ScannerScreen (ML Kit)
+ * - Merge → MergeScreen (iText 7)
+ * - Split → SplitScreen (iText 7)
+ * - Compress → CompressScreen (iText 7)
+ * - Image to PDF → ImageToPdfScreen (iText 7)
+ * - OCR → OcrScreen (ML Kit Text Recognition)
+ * - Sign → SignatureScreen (existing)
+ * - Convert → ConvertScreen (PdfRenderer)
+ * - Protect → ProtectScreen (iText 7)
+ * - Watermark → WatermarkScreen (iText 7)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToolsScreen(
-    onScanClick: () -> Unit = {}
+    onScanClick: () -> Unit = {},
+    onToolClick: (String) -> Unit = {}
 ) {
     val tools = remember {
         listOf(
             ToolItem(Icons.Filled.DocumentScanner, "Scan", "scan"),
-            ToolItem(Icons.Filled.CallMerge, "Merge", "merge"),
-            ToolItem(Icons.Filled.ContentCut, "Split", "split"),
-            ToolItem(Icons.Filled.Compress, "Compress", "compress"),
-            ToolItem(Icons.Filled.Image, "Image to PDF", "image_to_pdf"),
-            ToolItem(Icons.Filled.TextFields, "OCR", "ocr"),
+            ToolItem(Icons.Filled.CallMerge, "Merge", Screen.Merge.route),
+            ToolItem(Icons.Filled.ContentCut, "Split", Screen.Split.route),
+            ToolItem(Icons.Filled.Compress, "Compress", Screen.Compress.route),
+            ToolItem(Icons.Filled.Image, "Image to PDF", Screen.ImageToPdf.route),
+            ToolItem(Icons.Filled.TextFields, "OCR", Screen.Ocr.route),
             ToolItem(Icons.Filled.Draw, "Sign", "sign"),
-            ToolItem(Icons.Filled.SwapHoriz, "Convert", "convert"),
-            ToolItem(Icons.Filled.Lock, "Protect", "protect")
+            ToolItem(Icons.Filled.SwapHoriz, "Convert", Screen.Convert.route),
+            ToolItem(Icons.Filled.Lock, "Protect", Screen.Protect.route),
+            ToolItem(Icons.Filled.Water, "Watermark", Screen.Watermark.route),
+            ToolItem(Icons.Filled.Reorder, "Reorder", Screen.PageReorder.route)
         )
     }
 
@@ -144,10 +158,10 @@ fun ToolsScreen(
                     icon = tool.icon,
                     label = tool.label,
                     onClick = {
-                        when (tool.action) {
+                        when (tool.route) {
                             "scan" -> onScanClick()
-                            // Other tools → Phase 5
-                            else -> { /* TODO */ }
+                            "sign" -> onScanClick() // Navigate to scanner for now; sign uses ReaderScreen edit mode
+                            else -> onToolClick(tool.route)
                         }
                     }
                 )

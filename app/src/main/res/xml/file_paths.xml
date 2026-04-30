@@ -5,6 +5,16 @@
         name="scans"
         path="scans/" />
 
+    <!-- Tool outputs (merge, split, compress, convert, protect, watermark, OCR) -->
+    <files-path
+        name="tools_output"
+        path="tools_output/" />
+
+    <!-- Fallback for files created directly under filesDir -->
+    <files-path
+        name="internal_files"
+        path="." />
+
     <!-- Cache for temporary files -->
     <cache-path
         name="cache"
