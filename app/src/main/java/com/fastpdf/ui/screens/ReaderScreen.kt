@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.fastpdf.data.CurrentFile
@@ -58,14 +61,8 @@ import androidx.compose.ui.platform.LocalContext
 
 /**
  * Smart Reader Screen with editing capabilities.
- *
- * Phase 4 additions:
- * - Edit mode toggle (pencil icon in top bar)
- * - Annotation toolbar (Pen, Highlighter, Text, Stamp)
- * - Drawing canvas overlay on documents
- * - Signature pad (bottom sheet)
- * - Stamp picker (bottom sheet)
- * - Undo/redo for annotations
+ * Redesigned to match "Edit Document" reference UI with clean top bar
+ * using X (close) buttons and centered title.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,7 +93,7 @@ fun ReaderScreen(
 
     // Image viewer has black background
     val isImageViewer = fileType == DocumentType.IMAGE && CurrentFile.uri != null
-    val topBarContainerColor = if (isImageViewer) Color.Black.copy(alpha = 0.5f) else Color.Transparent
+    val topBarContainerColor = if (isImageViewer) Color.Black.copy(alpha = 0.5f) else MaterialTheme.colorScheme.background
     val topBarContentColor = if (isImageViewer) Color.White else MaterialTheme.colorScheme.onSurface
 
     // Can this file type be annotated?
@@ -104,27 +101,36 @@ fun ReaderScreen(
         DocumentType.PDF, DocumentType.IMAGE, DocumentType.TEXT
     )
 
+    // Dynamic title based on edit mode
+    val topBarTitle = if (isEditMode) "Edit Document" else fileName
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = fileName,
+                        text = topBarTitle,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = topBarContentColor
+                        color = topBarContentColor,
+                        textAlign = TextAlign.Center
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        CurrentFile.clear()
-                        onBack()
+                        if (isEditMode) {
+                            isEditMode = false
+                            activeTool = EditTool.NONE
+                        } else {
+                            CurrentFile.clear()
+                            onBack()
+                        }
                     }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = "Close",
                             tint = topBarContentColor
                         )
                     }
@@ -186,7 +192,12 @@ fun ReaderScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "📄", style = MaterialTheme.typography.displayLarge)
+                    Icon(
+                        Icons.Filled.InsertDriveFile,
+                        contentDescription = null,
+                        tint = Color(0xFFD1D5DB),
+                        modifier = Modifier.size(64.dp)
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Use the + button to open a file",
@@ -294,7 +305,7 @@ fun ReaderScreen(
                             strokes.add(
                                 DrawingStroke(
                                     points = points,
-                                    color = Color(0xFF1A1C2E),
+                                    color = Color(0xFF1A3C40),
                                     strokeWidth = 3f
                                 )
                             )
@@ -341,7 +352,7 @@ fun ReaderScreen(
             }
         }
 
-        // ━━━ Document Info Bottom Sheet (Phase 10) ━━━
+        // ━━━ Document Info Bottom Sheet ━━━
         if (showDocInfo) {
             ModalBottomSheet(
                 onDismissRequest = { showDocInfo = false },

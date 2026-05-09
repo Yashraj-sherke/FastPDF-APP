@@ -35,8 +35,8 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SelectAll
@@ -68,6 +68,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -80,6 +81,7 @@ import com.fastpdf.domain.model.DocumentType
 import com.fastpdf.ui.components.DocumentFileItem
 import com.fastpdf.ui.theme.AccentRed
 import com.fastpdf.ui.theme.Primary
+import com.fastpdf.ui.theme.PrimaryLight
 import com.fastpdf.util.formatTimeAgo
 import kotlinx.coroutines.launch
 
@@ -100,18 +102,7 @@ private val SUPPORTED_MIME_TYPES = arrayOf(
 
 /**
  * Files Screen — Real file browser with Room-backed data.
- *
- * Phase 7:
- * - Real file list from Room database
- * - Live search with Room query
- * - Sort by Recent/Name/Size
- * - Favorite toggle
- * - File access tracking
- *
- * Phase 9:
- * - Multi-select mode (long press to activate)
- * - Batch delete, favorite, share
- * - Batch action bar with count
+ * Redesigned with teal theme, clean white background, and modern styling.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -128,7 +119,7 @@ fun FilesScreen(
     var searchQuery by remember { mutableStateOf("") }
     var showSearch by remember { mutableStateOf(false) }
 
-    // Phase 9: Multi-select state
+    // Multi-select state
     var isSelectMode by remember { mutableStateOf(false) }
     val selectedUris = remember { mutableStateListOf<String>() }
 
@@ -201,12 +192,13 @@ fun FilesScreen(
                         Text(
                             text = "${selectedUris.size} selected",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            color = Primary
                         )
                     },
                     navigationIcon = {
                         IconButton(onClick = { exitSelectMode() }) {
-                            Icon(Icons.Filled.Close, contentDescription = "Cancel")
+                            Icon(Icons.Filled.Close, contentDescription = "Cancel", tint = Primary)
                         }
                     },
                     actions = {
@@ -223,30 +215,29 @@ fun FilesScreen(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Primary.copy(alpha = 0.08f)
+                        containerColor = PrimaryLight
                     )
                 )
             } else {
                 TopAppBar(
                     title = {
                         Text(
-                            text = "Files",
+                            text = "My Files",
                             style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.Bold,
+                            color = Primary
                         )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { }) { Icon(Icons.Filled.Menu, contentDescription = "Menu") }
                     },
                     actions = {
                         IconButton(onClick = { showSearch = !showSearch; if (!showSearch) searchQuery = "" }) {
                             Icon(
                                 if (showSearch) Icons.Filled.Close else Icons.Filled.Search,
-                                contentDescription = "Search"
+                                contentDescription = "Search",
+                                tint = Primary
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
                 )
             }
         },
@@ -255,7 +246,13 @@ fun FilesScreen(
                 FloatingActionButton(
                     onClick = { filePickerLauncher.launch(SUPPORTED_MIME_TYPES) },
                     containerColor = Primary,
-                    contentColor = Color.White
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    modifier = Modifier.shadow(
+                        elevation = 12.dp,
+                        shape = CircleShape,
+                        spotColor = Primary.copy(alpha = 0.4f)
+                    )
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = "Open File")
                 }
@@ -275,17 +272,19 @@ fun FilesScreen(
                         OutlinedTextField(
                             value = searchQuery,
                             onValueChange = { searchQuery = it },
-                            placeholder = { Text("Search files...") },
+                            placeholder = { Text("Search files...", color = Color(0xFFADB5BD)) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                                .padding(horizontal = 20.dp, vertical = 8.dp),
                             shape = RoundedCornerShape(16.dp),
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Primary,
-                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
                             ),
-                            leadingIcon = { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) }
+                            leadingIcon = { Icon(Icons.Filled.Search, null, tint = Color(0xFFADB5BD)) }
                         )
                     }
                 }
@@ -295,7 +294,7 @@ fun FilesScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                            .padding(horizontal = 20.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -305,13 +304,13 @@ fun FilesScreen(
                                     text = sortOption,
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = Primary
                                 )
                                 Icon(
                                     imageVector = Icons.Filled.KeyboardArrowDown,
                                     contentDescription = "Sort",
                                     modifier = Modifier.size(20.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = Primary
                                 )
                             }
                             DropdownMenu(expanded = showSortMenu, onDismissRequest = { showSortMenu = false }) {
@@ -334,7 +333,7 @@ fun FilesScreen(
                                 Icon(
                                     imageVector = if (isGridView) Icons.Filled.ViewList else Icons.Filled.GridView,
                                     contentDescription = "Toggle View",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    tint = Primary
                                 )
                             }
                         }
@@ -348,7 +347,12 @@ fun FilesScreen(
                             modifier = Modifier.fillMaxWidth().padding(48.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("📂", style = MaterialTheme.typography.displayMedium)
+                            Icon(
+                                Icons.Filled.InsertDriveFile,
+                                contentDescription = null,
+                                tint = Color(0xFFD1D5DB),
+                                modifier = Modifier.size(56.dp)
+                            )
                             Spacer(Modifier.height(12.dp))
                             Text(
                                 text = if (searchQuery.isNotBlank()) "No files match \"$searchQuery\"" else "No files yet",
@@ -398,7 +402,7 @@ fun FilesScreen(
                                     }
                                 )
                                 .background(
-                                    if (isSelected) Primary.copy(alpha = 0.08f) else Color.Transparent
+                                    if (isSelected) PrimaryLight else Color.Transparent
                                 ),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -446,7 +450,7 @@ fun FilesScreen(
                 item { Spacer(modifier = Modifier.height(if (isSelectMode) 140.dp else 80.dp)) }
             }
 
-            // ━━━ Batch Action Bar (Phase 9) ━━━
+            // ━━━ Batch Action Bar ━━━
             AnimatedVisibility(
                 visible = isSelectMode && selectedUris.isNotEmpty(),
                 modifier = Modifier
@@ -458,10 +462,15 @@ fun FilesScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .padding(horizontal = 20.dp, vertical = 8.dp)
+                        .shadow(
+                            elevation = 8.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            spotColor = Primary.copy(alpha = 0.2f)
+                        )
                         .clip(RoundedCornerShape(20.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {

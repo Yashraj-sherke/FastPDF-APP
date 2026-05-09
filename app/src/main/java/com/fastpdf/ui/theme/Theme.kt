@@ -15,6 +15,7 @@ import androidx.core.view.WindowCompat
 
 /**
  * FastPDF Material 3 Theme.
+ * Redesigned with teal accent colors matching the reference UI.
  * Supports both Light and Dark modes.
  */
 
@@ -23,7 +24,7 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = OnPrimary,
     primaryContainer = PrimaryContainer,
     onPrimaryContainer = OnPrimaryContainer,
-    secondary = Primary,
+    secondary = PrimaryMedium,
     secondaryContainer = SecondaryContainer,
     onSecondaryContainer = OnSecondaryContainer,
     surface = Surface,
@@ -39,11 +40,11 @@ private val LightColorScheme = lightColorScheme(
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Primary,
+    primary = PrimaryMedium,
     onPrimary = OnPrimary,
     primaryContainer = DarkPrimaryContainer,
-    onPrimaryContainer = Color(0xFFB8C8FF),
-    secondary = Primary,
+    onPrimaryContainer = Color(0xFFB2DFDB),
+    secondary = PrimaryMedium,
     secondaryContainer = DarkSecondaryContainer,
     onSecondaryContainer = Color(0xFFCCCED4),
     surface = DarkSurface,
@@ -78,8 +79,8 @@ fun FastPDFTheme(
                     isAppearanceLightNavigationBars = false
                 }
             } else {
-                window.statusBarColor = Background.toArgb()
-                window.navigationBarColor = Background.toArgb()
+                window.statusBarColor = Color.White.toArgb()
+                window.navigationBarColor = Color.White.toArgb()
                 WindowCompat.getInsetsController(window, view).apply {
                     isAppearanceLightStatusBars = true
                     isAppearanceLightNavigationBars = true

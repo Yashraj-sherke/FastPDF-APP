@@ -26,8 +26,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.DocumentScanner
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material.icons.filled.Slideshow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -44,6 +46,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -54,16 +58,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fastpdf.ui.theme.GradientEnd
 import com.fastpdf.ui.theme.GradientStart
+import com.fastpdf.ui.theme.MintLight
+import com.fastpdf.ui.theme.MintPale
+import com.fastpdf.ui.theme.MintSoft
 import com.fastpdf.ui.theme.Primary
 import com.fastpdf.ui.theme.PrimaryLight
+import com.fastpdf.ui.theme.PrimaryMedium
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * Onboarding Screen — First-launch welcome carousel.
+ * Onboarding Screen — Matching the reference "PDF Reader, Read All Docs" UI.
  *
- * Phase 9: Shows 3 slides showcasing FastPDF's key features.
- * Displayed only on first app launch, then never again.
+ * Features a beautiful mint gradient background with floating document icons,
+ * a clean rounded title card, and a prominent "Get Started" CTA button.
  */
 
 private data class OnboardingPage(
@@ -76,21 +84,21 @@ private data class OnboardingPage(
 private val onboardingPages = listOf(
     OnboardingPage(
         icon = Icons.Filled.PictureAsPdf,
-        title = "All Your Documents\nin One Place",
-        subtitle = "Open and manage PDF, Word, Excel, PowerPoint, Images, and Text files — effortlessly.",
-        gradient = listOf(Color(0xFF4A6CF7), Color(0xFF6C8AFF))
+        title = "PDF Reader, Read\nAll Docs",
+        subtitle = "Read, manage & organize all your PDFs\neasily in one place.",
+        gradient = listOf(Color(0xFF1A3C40), Color(0xFF2D6A6F))
     ),
     OnboardingPage(
         icon = Icons.Filled.Build,
-        title = "Powerful PDF Tools\nat Your Fingertips",
-        subtitle = "Merge, Split, Compress, Watermark, Protect, OCR, and Convert — all offline, all free.",
-        gradient = listOf(Color(0xFF10B981), Color(0xFF34D399))
+        title = "Powerful Tools\nat Your Fingertips",
+        subtitle = "Merge, Split, Compress, OCR, and Convert\n— all offline, all free.",
+        gradient = listOf(Color(0xFF1A3C40), Color(0xFF2D6A6F))
     ),
     OnboardingPage(
         icon = Icons.Filled.AutoAwesome,
         title = "AI-Powered\nDocument Intelligence",
-        subtitle = "Summarize documents, extract key points, and chat with your files using Gemini AI.",
-        gradient = listOf(Color(0xFFFF8C42), Color(0xFFFFA76E))
+        subtitle = "Summarize documents, extract key points,\nand chat with your files.",
+        gradient = listOf(Color(0xFF1A3C40), Color(0xFF2D6A6F))
     )
 )
 
@@ -106,7 +114,13 @@ fun OnboardingScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(MintSoft, MintLight, MintPale),
+                    startY = 0f,
+                    endY = Float.POSITIVE_INFINITY
+                )
+            )
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -123,7 +137,7 @@ fun OnboardingScreen(
                     TextButton(onClick = onComplete) {
                         Text(
                             "Skip",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = Primary.copy(alpha = 0.6f),
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -163,13 +177,13 @@ fun OnboardingScreen(
                             .width(width.dp)
                             .clip(CircleShape)
                             .background(
-                                if (isSelected) Primary else MaterialTheme.colorScheme.outline
+                                if (isSelected) Primary else Primary.copy(alpha = 0.2f)
                             )
                     )
                 }
             }
 
-            // Action button
+            // "Get Started" CTA button — matching screenshot dark teal
             Button(
                 onClick = {
                     if (isLastPage) {
@@ -184,9 +198,16 @@ fun OnboardingScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp)
                     .padding(bottom = 48.dp)
-                    .height(58.dp),
+                    .height(58.dp)
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        spotColor = Primary.copy(alpha = 0.3f)
+                    ),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Primary)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Primary
+                )
             ) {
                 Text(
                     text = if (isLastPage) "Get Started" else "Next",
@@ -194,15 +215,13 @@ fun OnboardingScreen(
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White
                 )
-                if (!isLastPage) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }
@@ -222,59 +241,130 @@ private fun OnboardingPageContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp),
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        // Floating document icons cluster
         AnimatedVisibility(
             visible = visible,
             enter = fadeIn(tween(600)) + slideInVertically(tween(600)) { -40 }
         ) {
             Box(
                 modifier = Modifier
-                    .size(140.dp)
-                    .clip(RoundedCornerShape(32.dp))
-                    .background(
-                        Brush.linearGradient(page.gradient)
-                    ),
+                    .fillMaxWidth()
+                    .height(280.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = page.icon,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(64.dp)
+                // Title card — white rounded rectangle like in screenshot
+                Box(
+                    modifier = Modifier
+                        .shadow(
+                            elevation = 16.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            spotColor = Primary.copy(alpha = 0.15f)
+                        )
+                        .background(Color.White, RoundedCornerShape(20.dp))
+                        .padding(horizontal = 28.dp, vertical = 20.dp)
+                ) {
+                    Text(
+                        text = page.title,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 34.sp,
+                        color = Primary
+                    )
+                }
+
+                // Floating document icons around the card
+                // PDF icon — top right
+                FloatingDocIcon(
+                    icon = Icons.Filled.PictureAsPdf,
+                    tint = Color(0xFFE53935),
+                    bgColor = Color(0xFFFFEBEE),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 8.dp, top = 8.dp)
+                        .graphicsLayer { rotationZ = 12f }
+                )
+                // Word icon — top left
+                FloatingDocIcon(
+                    icon = Icons.Filled.Description,
+                    tint = Color(0xFF1565C0),
+                    bgColor = Color(0xFFE3F2FD),
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(start = 16.dp, top = 20.dp)
+                        .graphicsLayer { rotationZ = -8f }
+                )
+                // Excel icon — bottom left
+                FloatingDocIcon(
+                    icon = Icons.Filled.TableChart,
+                    tint = Color(0xFF2E7D32),
+                    bgColor = Color(0xFFE8F5E9),
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 8.dp, bottom = 16.dp)
+                        .graphicsLayer { rotationZ = 15f }
+                )
+                // PPT icon — bottom right
+                FloatingDocIcon(
+                    icon = Icons.Filled.Slideshow,
+                    tint = Color(0xFFE65100),
+                    bgColor = Color(0xFFFFF3E0),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 16.dp, bottom = 8.dp)
+                        .graphicsLayer { rotationZ = -10f }
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
+        // Subtitle text
         AnimatedVisibility(
             visible = visible,
             enter = fadeIn(tween(600, delayMillis = 200)) + slideInVertically(tween(600, delayMillis = 200)) { 30 }
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = page.title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 36.sp,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = page.subtitle,
+                    text = "✨ ${page.subtitle}",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     lineHeight = 24.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Primary.copy(alpha = 0.7f),
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun FloatingDocIcon(
+    icon: ImageVector,
+    tint: Color,
+    bgColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(12.dp),
+                spotColor = tint.copy(alpha = 0.2f)
+            )
+            .size(48.dp)
+            .background(bgColor, RoundedCornerShape(12.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier.size(26.dp)
+        )
     }
 }

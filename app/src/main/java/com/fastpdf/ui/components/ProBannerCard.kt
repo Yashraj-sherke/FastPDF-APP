@@ -18,11 +18,11 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -34,7 +34,7 @@ import com.fastpdf.ui.theme.Primary
 
 /**
  * "Unlock Pro Tools" promotional card for the Tools screen.
- * Gradient background with CTA button.
+ * Deep teal gradient background with clean CTA button.
  */
 @Composable
 fun ProBannerCard(
@@ -45,17 +45,19 @@ fun ProBannerCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(18.dp))
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = Primary.copy(alpha = 0.3f)
+            )
+            .clip(RoundedCornerShape(20.dp))
             .background(
                 brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        GradientStart,
-                        GradientEnd
-                    )
+                    colors = listOf(GradientStart, GradientEnd)
                 )
             )
             .clickable(onClick = onUpgradeClick)
-            .padding(20.dp)
+            .padding(22.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -67,21 +69,21 @@ fun ProBannerCard(
                     text = "Unlock Pro Tools",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 17.sp
+                    fontSize = 18.sp
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = "Get unlimited OCR and\nadvanced security features.",
-                    color = Color.White.copy(alpha = 0.85f),
+                    color = Color.White.copy(alpha = 0.8f),
                     fontSize = 13.sp,
                     lineHeight = 18.sp
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(12.dp))
                         .background(Color.White)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .padding(horizontal = 20.dp, vertical = 10.dp)
                 ) {
                     Text(
                         text = "Upgrade Now",
@@ -97,8 +99,8 @@ fun ProBannerCard(
             Icon(
                 imageVector = Icons.Filled.AutoAwesome,
                 contentDescription = "Pro",
-                tint = Color.White.copy(alpha = 0.4f),
-                modifier = Modifier.size(48.dp)
+                tint = Color.White.copy(alpha = 0.3f),
+                modifier = Modifier.size(52.dp)
             )
         }
     }

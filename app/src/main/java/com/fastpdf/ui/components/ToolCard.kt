@@ -15,16 +15,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fastpdf.ui.theme.Primary
-import com.fastpdf.ui.theme.SurfaceVariant
+import com.fastpdf.ui.theme.PrimaryLight
 
 /**
  * Tool card for the Tools screen grid.
  * Displays an icon above a label in a rounded card.
- * Matches the 2-column grid from the reference UI.
+ * Updated to match the teal-themed reference UI with clean shadows.
  */
 @Composable
 fun ToolCard(
@@ -35,18 +37,23 @@ fun ToolCard(
 ) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(SurfaceVariant)
+            .shadow(
+                elevation = 2.dp,
+                shape = RoundedCornerShape(18.dp),
+                spotColor = Primary.copy(alpha = 0.08f)
+            )
+            .clip(RoundedCornerShape(18.dp))
+            .background(MaterialTheme.colorScheme.surface)
             .clickable(onClick = onClick)
-            .padding(vertical = 20.dp, horizontal = 12.dp),
+            .padding(vertical = 22.dp, horizontal = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Primary.copy(alpha = 0.08f)),
+                .size(52.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(PrimaryLight),
             contentAlignment = Alignment.Center
         ) {
             Icon(

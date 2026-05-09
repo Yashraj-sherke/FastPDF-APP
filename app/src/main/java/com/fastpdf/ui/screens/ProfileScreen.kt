@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Security
@@ -31,7 +30,6 @@ import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -47,6 +45,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -56,13 +56,14 @@ import com.fastpdf.data.ThemePreferences
 import com.fastpdf.data.db.FileRepository
 import com.fastpdf.ui.theme.Primary
 import com.fastpdf.ui.theme.PrimaryLight
-import com.fastpdf.ui.theme.SurfaceVariant
+import com.fastpdf.ui.theme.PrimaryMedium
+import com.fastpdf.ui.theme.GradientStart
+import com.fastpdf.ui.theme.GradientEnd
 import kotlinx.coroutines.launch
 
 /**
  * Profile Screen — User settings and preferences.
- *
- * Phase 8: Added working dark mode toggle with DataStore persistence.
+ * Redesigned with teal theme and modern card-based layout.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,16 +84,12 @@ fun ProfileScreen(
                     Text(
                         text = "Profile",
                         style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Bold,
+                        color = Primary
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = { /* TODO: Drawer */ }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Menu")
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
@@ -113,23 +110,31 @@ fun ProfileScreen(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(80.dp)
+                            .size(88.dp)
+                            .shadow(
+                                elevation = 8.dp,
+                                shape = CircleShape,
+                                spotColor = Primary.copy(alpha = 0.2f)
+                            )
                             .clip(CircleShape)
-                            .background(PrimaryLight),
+                            .background(
+                                Brush.linearGradient(listOf(GradientStart, GradientEnd))
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Person,
                             contentDescription = "Profile",
-                            tint = Primary,
-                            modifier = Modifier.size(40.dp)
+                            tint = Color.White,
+                            modifier = Modifier.size(44.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
                     Text(
                         text = "Yashraj Sherke",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = "yashraj@fastpdf.app",
@@ -144,10 +149,15 @@ fun ProfileScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .padding(20.dp),
+                        .padding(horizontal = 20.dp)
+                        .shadow(
+                            elevation = 4.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            spotColor = Primary.copy(alpha = 0.1f)
+                        )
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(PrimaryLight)
+                        .padding(22.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     StatItem(value = "$fileCount", label = "Files")
@@ -182,27 +192,36 @@ fun ProfileScreen(
                 )
             }
 
-            item { HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) }
+            item { HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant) }
 
-            // ━━━ Dark Mode Toggle (Phase 8) ━━━
+            // ━━━ Dark Mode Toggle ━━━
             item {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                        .padding(horizontal = 20.dp, vertical = 14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.DarkMode,
-                        contentDescription = "Dark Mode",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(PrimaryLight),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.DarkMode,
+                            contentDescription = "Dark Mode",
+                            tint = Primary,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Dark Mode",
                             style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
@@ -217,8 +236,10 @@ fun ProfileScreen(
                             scope.launch { ThemePreferences.setDarkMode(context, enabled) }
                         },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = Primary,
-                            checkedTrackColor = Primary.copy(alpha = 0.3f)
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = Primary,
+                            uncheckedThumbColor = Color.White,
+                            uncheckedTrackColor = Color(0xFFE0E0E0)
                         )
                     )
                 }
@@ -232,7 +253,7 @@ fun ProfileScreen(
                 )
             }
 
-            item { HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) }
+            item { HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant) }
 
             item {
                 SettingsItem(
@@ -285,27 +306,39 @@ private fun SettingsItem(
     icon: ImageVector,
     title: String,
     subtitle: String,
-    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    tint: Color = Primary,
     onClick: (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .padding(horizontal = 20.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = title,
-            tint = tint,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
+        // Icon with rounded background
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    if (tint == Color(0xFFEF4444)) Color(0xFFFFEBEE) else PrimaryLight
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = tint,
+                modifier = Modifier.size(22.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Medium,
                 color = if (tint == Color(0xFFEF4444)) tint else MaterialTheme.colorScheme.onSurface
             )
             if (subtitle.isNotEmpty()) {
@@ -319,7 +352,7 @@ private fun SettingsItem(
         Icon(
             imageVector = Icons.Filled.ChevronRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
             modifier = Modifier.size(20.dp)
         )
     }
@@ -332,4 +365,3 @@ private fun formatStorageSize(bytes: Long): String = when {
     bytes < 1024 * 1024 * 1024 -> "%.1f MB".format(bytes / (1024.0 * 1024.0))
     else -> "%.1f GB".format(bytes / (1024.0 * 1024.0 * 1024.0))
 }
-
